@@ -10,25 +10,27 @@ class PortSQLite {
 
     public function Import($input_file) {
         $data = json_decode(file_get_contents($input_file),true);
-        foreach ($data['tables'] as $table) {
-            $name = $table['name'];
-            $this->sqlizer->RunSQL($table['schema']);
-            foreach ($table['rows'] as $row) {
-                $statment = "replace into $name ";
-                $keys = "(";
-                $values = "(";
-                foreach ($row as $key=>$value) {
-                    $keys .= $key . ',';
-                    $values .= ":$key,";
-                    $sql['values'][':' . $key] = $value;
+        if (!empty($data['tables'])) {
+            foreach ($data['tables'] as $table) {
+                $name = $table['name'];
+                $this->sqlizer->RunSQL($table['schema']);
+                foreach ($table['rows'] as $row) {
+                    $statment = "replace into $name ";
+                    $keys = "(";
+                    $values = "(";
+                    foreach ($row as $key=>$value) {
+                        $keys .= $key . ',';
+                        $values .= ":$key,";
+                        $sql['values'][':' . $key] = $value;
+                    }
+                    $keys = rtrim($keys,',');
+                    $values = rtrim($values,',');
+                    $keys .= ")";
+                    $values .= ")";
+                    $sql['statement'] = "replace into $name $keys values $values";
+                    $this->sqlizer->RunSQL($sql);
+                    unset($sql);
                 }
-                $keys = rtrim($keys,',');
-                $values = rtrim($values,',');
-                $keys .= ")";
-                $values .= ")";
-                $sql['statement'] = "replace into $name $keys values $values";
-                $this->sqlizer->RunSQL($sql);
-                unset($sql);
             }
         }
     }
