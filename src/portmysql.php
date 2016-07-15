@@ -4,10 +4,9 @@ class PortMySQL {
 
     private $sqlizer;
 
-    public function __construct($db_file) {
-        require_once '/home/mike/framework/modules/sqlizer/src/sqlizer.php';
-        $this->sqlizer = new Sqlizer('localhost','3306','test','password','test');
-        }
+    public function __construct($sqlizer) {
+        $this->sqlizer = $sqlizer;
+    }
 
     public function Import($input_file) {
         $data = json_decode(file_get_contents($input_file),true);
